@@ -1,11 +1,13 @@
+import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/app-text';
 import { Initial } from '@/components/badges';
+import { Button } from '@/components/button';
 import { Card } from '@/components/card';
 import { ListRow } from '@/components/list-row';
 import { Screen } from '@/components/screen';
-import { useAppState, type Tone } from '@/state/app-store';
+import { actions, useAppState, type Tone } from '@/state/app-store';
 import { colors, space } from '@/theme/tokens';
 
 const TONE_LABEL: Record<Tone, string> = { soft: 'Yumuşak', friendly: 'Samimi', tough: 'Sert' };
@@ -13,6 +15,8 @@ const TONE_LABEL: Record<Tone, string> = { soft: 'Yumuşak', friendly: 'Samimi',
 /** Profil ve ayarlar. Alt ekranlar henüz tasarlanmadı (docs/TASKS.md). */
 export default function ProfileScreen() {
   const profile = useAppState((s) => s.profile);
+  // Silme geri alınamaz: ilk dokunuş sorar, ikincisi siler (web'de Alert çalışmadığı için sayfa içinde).
+  const [confirmReset, setConfirmReset] = useState(false);
 
   return (
     <Screen edges={['top']}>
@@ -46,6 +50,19 @@ export default function ProfileScreen() {
         />
         <ListRow title="Yardım ve iletişim" />
       </Card>
+
+      <View style={{ gap: space.xs }}>
+        <Button
+          title={confirmReset ? 'Emin misin? Tekrar dokun, her şey silinsin' : 'Verilerimi sil ve baştan başla'}
+          variant="ghost"
+          onPress={() => (confirmReset ? actions.resetAll() : setConfirmReset(true))}
+        />
+        {confirmReset ? (
+          <AppText variant="caption" color={colors.muted} align="center">
+            Hedeflerin, nedenin ve serin bu telefondan silinir.
+          </AppText>
+        ) : null}
+      </View>
     </Screen>
   );
 }

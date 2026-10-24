@@ -12,7 +12,7 @@ Taklit edilen yerlerin tam listesi: `grep -rn "MOCK:\|TODO(" src`
 
 ## 1. Temel altyapı
 
-- [ ] **Kalıcı durum**: kurulum bilgisi ve profil uygulama kapanınca kaybolmasın (`expo-sqlite/kv-store` veya AsyncStorage). Bugün her açılışta kurulum baştan başlıyor.
+- [x] **Kalıcı durum**: kurulum, hedefler ve günün işleri telefonda saklanıyor (AsyncStorage, `carter:state:v1`). Gün değişince işler hedeflerden yeniden oluşuyor. Profil → "Verilerimi sil ve baştan başla".
 - [ ] **Sunucu seçimi ve kurulum** (öneri: Supabase): tablolar — users, goals, tasks, daily_plans, reports, streaks, challenges.
 - [ ] **Kimlik**: Apple ile giriş, Google ile giriş, e-posta. "Hesabım var, giriş yap" ayrı ekran.
 - [ ] `src/data/mock.ts` yerine API istemcisi; ekranlar aynı kalsın.
