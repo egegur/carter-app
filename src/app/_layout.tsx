@@ -37,6 +37,9 @@ export default function RootLayout() {
     <>
       <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.ground } }}>
+        {/* Hukuki metinler her zaman açılabilir (kurulumda da gerekir). */}
+        <Stack.Screen name="legal/[doc]" options={{ presentation: 'modal' }} />
+
         {/* Kurulum bitmeden sadece kurulum ekranları açılır. */}
         <Stack.Protected guard={!onboarded}>
           <Stack.Screen name="onboarding" />

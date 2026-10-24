@@ -27,7 +27,7 @@ export default function ProfileScreen() {
       </View>
 
       <Card>
-        <ListRow title="Hedeflerim" value="2 aktif" />
+        <ListRow title="Hedeflerim" value={`${profile.categories.length} aktif`} />
         <ListRow title="Nedenim ve Carter'ın tonu" value={TONE_LABEL[profile.tone]} />
         <ListRow title="Araç kutusu" value="2 açık" />
         <ListRow title="Sabah ve akşam saatleri" value="08:30 · 21:00" />
@@ -36,7 +36,14 @@ export default function ProfileScreen() {
       <Card>
         <ListRow title="Abonelik" />
         <ListRow title="İzinler" />
-        <ListRow title="Gizlilik ve verilerim" />
+        <ListRow
+          title="Gizlilik ve verilerim"
+          href={{ pathname: '/legal/[doc]', params: { doc: 'aydinlatma' } }}
+        />
+        <ListRow
+          title="Kullanım Şartları"
+          href={{ pathname: '/legal/[doc]', params: { doc: 'kullanim-sartlari' } }}
+        />
         <ListRow title="Yardım ve iletişim" />
       </Card>
     </Screen>

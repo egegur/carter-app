@@ -10,6 +10,7 @@ import { Screen } from '@/components/screen';
 import { chatSeed } from '@/data/mock';
 import { useAppState, useTask, type Tone } from '@/state/app-store';
 import { colors, fonts, minTouch, radius, space } from '@/theme/tokens';
+import { hasContent } from '@/utils/validation';
 
 type Message = { from: 'carter' | 'me'; text: string };
 
@@ -24,7 +25,7 @@ export default function ChatScreen() {
 
   const send = () => {
     const text = draft.trim();
-    if (!text) return;
+    if (!hasContent(text)) return;
     // MOCK: Carter'ın cevabı sunucudaki koç servisinden gelecek (docs/ARCHITECTURE.md).
     setMessages((m) => [...m, { from: 'me', text }]);
     setDraft('');
@@ -53,14 +54,15 @@ export default function ChatScreen() {
             onChangeText={setDraft}
             onSubmitEditing={send}
             returnKeyType="send"
+            maxLength={500}
             style={styles.input}
           />
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Gönder"
-            disabled={!draft.trim()}
+            disabled={!hasContent(draft)}
             onPress={send}
-            style={[styles.send, !draft.trim() && styles.sendDisabled]}>
+            style={[styles.send, !hasContent(draft) && styles.sendDisabled]}>
             <Icon name="send" size={18} color={colors.onDark} />
           </Pressable>
         </View>

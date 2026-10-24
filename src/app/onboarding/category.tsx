@@ -1,29 +1,37 @@
+import { router } from 'expo-router';
+
+import { AppText } from '@/components/app-text';
 import { Button } from '@/components/button';
 import { CarterBubble } from '@/components/carter';
 import { StepHeader } from '@/components/header';
-import { OptionList } from '@/components/option';
+import { CheckList } from '@/components/option';
 import { Screen } from '@/components/screen';
-import { actions, useAppState, type Category } from '@/state/app-store';
+import { CATEGORIES } from '@/content/categories';
+import { useFormErrors } from '@/hooks/use-form-errors';
+import { actions, useAppState } from '@/state/app-store';
+import { colors } from '@/theme/tokens';
 
-const OPTIONS = [
-  { value: 'sport', label: 'Spor' },
-  { value: 'nutrition', label: 'Sağlıklı beslenme' },
-  { value: 'work', label: 'İş' },
-  { value: 'study', label: 'Ders ve öğrenme' },
-  { value: 'home', label: 'Ev işleri' },
-  { value: 'other', label: 'Başka bir şey' },
-] as const satisfies readonly { value: Category; label: string }[];
-
-/** Adım 1: alan seçimi */
+/** Adım 1: alan seçimi (çoklu) */
 export default function CategoryScreen() {
-  const category = useAppState((s) => s.profile.category);
+  const categories = useAppState((s) => s.profile.categories);
+  const form = useFormErrors({ categories: categories.length === 0 ? 'En az bir alan seç.' : null });
 
   return (
     <Screen
       header={<StepHeader step={1} total={5} />}
-      footer={<Button title="Devam" disabled={!category} href="/onboarding/goal" />}>
-      <CarterBubble message="En çok neyi erteliyorsun? Bir tanesiyle başlayalım, sonra ekleriz." />
-      <OptionList options={OPTIONS} value={category} onChange={(c) => actions.updateProfile({ category: c })} />
+      footer={
+        <Button
+          title={categories.length > 1 ? `${categories.length} alanla devam et` : 'Devam'}
+          onPress={() => form.submit(() => router.push({ pathname: '/onboarding/goal', params: { i: '0' } }))}
+        />
+      }>
+      <CarterBubble message="Neleri erteliyorsun? Birden fazla seçebilirsin; her biri için ayrı hedef koyacağız." />
+      <CheckList options={CATEGORIES} values={categories} onToggle={actions.toggleCategory} />
+      {form.errorFor('categories') ? (
+        <AppText variant="caption" color={colors.danger} accessibilityLiveRegion="polite">
+          {form.errorFor('categories')}
+        </AppText>
+      ) : null}
     </Screen>
   );
 }

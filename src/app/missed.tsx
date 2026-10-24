@@ -8,7 +8,7 @@ import { CarterBubble } from '@/components/carter';
 import { BackHeader } from '@/components/header';
 import { OptionList } from '@/components/option';
 import { Screen } from '@/components/screen';
-import { actions, useAppState, useTask } from '@/state/app-store';
+import { actions, useAppState, useSmallestStep, useTask } from '@/state/app-store';
 import { colors } from '@/theme/tokens';
 
 type Reason = 'time' | 'start' | 'forgot' | 'other';
@@ -26,7 +26,7 @@ const FALLBACK_STEP = 'Raporun ilk başlığını yaz. Gerisi bonus.';
 export default function MissedScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const task = useTask(id);
-  const smallestStep = useAppState((s) => s.profile.smallestStep.trim()) || FALLBACK_STEP;
+  const smallestStep = useSmallestStep(task) || FALLBACK_STEP;
   const jokers = useAppState((s) => s.jokersLeft);
   // MOCK: sebep sunucuya gidip haftalık özette "en sık engel" olarak kullanılacak.
   const [reason, setReason] = useState<Reason | null>(null);

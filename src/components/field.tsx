@@ -6,20 +6,27 @@ import { colors, fonts, radius, space } from '@/theme/tokens';
 type Props = TextInputProps & {
   label: string;
   hint?: string;
+  /** Verilirse alanın altında kırmızı gösterilir ve hint'in yerini alır. */
+  error?: string;
 };
 
-export function Field({ label, hint, multiline, style, ...rest }: Props) {
+export function Field({ label, hint, error, multiline, style, ...rest }: Props) {
   return (
     <View style={styles.wrap}>
       <AppText variant="label">{label}</AppText>
       <TextInput
         accessibilityLabel={label}
+        accessibilityHint={error}
         placeholderTextColor={colors.muted}
         multiline={multiline}
-        style={[styles.input, multiline && styles.multiline, style]}
+        style={[styles.input, multiline && styles.multiline, error ? styles.inputError : null, style]}
         {...rest}
       />
-      {hint ? (
+      {error ? (
+        <AppText variant="caption" color={colors.danger} accessibilityLiveRegion="polite">
+          {error}
+        </AppText>
+      ) : hint ? (
         <AppText variant="caption" color={colors.muted}>
           {hint}
         </AppText>
@@ -42,5 +49,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.ink,
   },
+  inputError: { borderColor: colors.danger, borderWidth: 1.5 },
   multiline: { minHeight: 96, textAlignVertical: 'top' },
 });
