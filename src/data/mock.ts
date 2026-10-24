@@ -3,12 +3,16 @@
  * Gerçek veriye geçerken bu dosya silinecek.
  */
 
+import type { Category } from '@/content/categories';
+
 /** focus: odak seansı · photo: anlık fotoğraf · word: sözlü onay (hesap ekranı) */
 export type ProofType = 'focus' | 'photo' | 'word';
 
 export type Task = {
   id: string;
   proof: ProofType;
+  /** Hangi hedeften geldiği (kurulumda seçilen alan). */
+  category?: Category;
   title: string;
   time: string;
   place?: string;

@@ -9,7 +9,10 @@ Ertelenen günlük işleri (iş, ders, spor, beslenme, ev işleri…) **bitirten
 - Pazar: Türkiye, Türkçe. iOS ve Android aynı anda.
 - Koç: **Koç Carter** (çalışma adı). Yüz göstermez; animasyonlu karakter (seçenek C). Karakter gelene kadar "C" avatarı.
 - Ton: kullanıcı seçer — Yumuşak / Samimi / Sert. İnsan gibi konuşur.
-- Alan sınırı yok; kullanıcı bir alanla başlar, sonra ekler.
+- Alan sınırı yok; kurulumda **birden fazla alan** seçilebilir ve her alan için ayrı hedef (hedef, sıklık, en küçük adım) girilir.
+- Sıklık: her gün, hafta içi, hafta sonu, haftada 1–6 gün ya da belirli günler.
+- Serbest metin alanları anlamlı metin ister (en az kelime/harf, işaret ve karalama engeli). Kurallar: `src/utils/validation.ts`.
+- İzinler seçilen alanlara göre istenir: bildirim ve Ekran Süresi herkese; adım sayısı sadece Spor veya Sağlıklı beslenme seçildiyse.
 
 ## Günlük döngü
 
@@ -39,6 +42,8 @@ Kişisel günlük challenge · Düello (3 gün, kanıtlı iş = 1 puan) · Takı
 - Fotoğraf ve ses kaydı **sadece telefonda** kalır; sunucuya ancak teknik zorunluluk varsa gider.
 - Topluluk içeriğinde katmanlı moderasyon: cihaz içi kontrol + bildir düğmesi + inceleme kuyruğu.
 - Ekran Süresi verisinde ne izlendiğini göremeyiz (Apple Screen Time API'sinin doğası).
+- Adım sayısı sağlık verisi sayılabileceği için **açık rıza** ile alınır (KVKK m.6); onay kutusu varsayılan işaretsiz, rıza vermeyen uygulamanın geri kalanını kullanabilir.
+- Hukuki metinler (aydınlatma, açık rıza, kullanım şartları) uygulamada **taslak** olarak var; avukat kontrolü yayından önce.
 
 ## İş modeli
 

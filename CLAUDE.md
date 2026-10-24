@@ -12,10 +12,11 @@ npm install
 npx expo start          # Expo Go veya dev build ile aç
 npm run typecheck       # tsc --noEmit
 npm run lint            # expo lint (ESLint)
+npm run test:rules      # metin kuralları testi (scripts/test-validation.mts)
 npx expo run:ios        # native modül eklendikten sonra (Mac + Xcode)
 ```
 
-Bir işi "bitti" demeden önce `npm run typecheck` ve `npm run lint` temiz geçmeli.
+Bir işi "bitti" demeden önce `npm run typecheck`, `npm run lint` ve `npm run test:rules` temiz geçmeli.
 
 ## Klasörler
 
@@ -24,7 +25,9 @@ Bir işi "bitti" demeden önce `npm run typecheck` ve `npm run lint` temiz geçm
 - `src/theme/tokens.ts` — renk, yazı, boşluk, köşe. **Tek kaynak.**
 - `src/state/app-store.ts` — geçici, bellekteki uygulama durumu.
 - `src/data/mock.ts` — örnek veri. Sunucu gelince silinecek.
-- `src/utils/` — saf yardımcılar (Türkçe sayı/ek biçimlendirme).
+- `src/content/` — alanlar, sıklık seçenekleri, hukuki metinler (veri, ekran değil).
+- `src/hooks/` — ekranlar arası ortak hook'lar (`useFormErrors`).
+- `src/utils/` — saf yardımcılar (Türkçe sayı/ek biçimlendirme, metin kuralları).
 
 ## Kurallar
 
@@ -39,6 +42,9 @@ Bir işi "bitti" demeden önce `npm run typecheck` ve `npm run lint` temiz geçm
 9. `ios/` ve `android/` klasörlerini elle düzenleme; native ayar `app.json` + config plugin ile yapılır.
 10. Native kod tek yerde: `modules/carter-native` (henüz yok, bkz. TASKS). Ekranlar native API'yi doğrudan çağırmaz, bu modülün TypeScript arayüzünü çağırır.
 11. Kilit ekranı ve engel (Shield) ekranı React Native ekranı değildir; native uzantılarla yapılır (bkz. ARCHITECTURE).
+12. **Serbest metin alanı = kural.** Kullanıcının yazdığı her alan `src/utils/validation.ts` içindeki `checkText` + `TEXT_RULES` ile kontrol edilir ("." veya "asdf" geçmez). Hatalar `useFormErrors` ile alan dışına çıkınca ya da butona basınca gösterilir; ana buton devre dışı bırakılmaz, basınca hatayı gösterir. Kuralı değiştirirsen `scripts/test-validation.mts` listesine örnek ekle ve `npm run test:rules` çalıştır.
+13. Alana göre değişen her şey (yer tutucu metin, gereken izin, varsayılan kanıt türü) `src/content/categories.ts` içindedir; ekranlarda `if (category === ...)` yazma.
+14. Hukuki metinler `src/content/legal.ts` içinde, **taslak**. Kişisel veri isteyen yeni bir izin eklersen aydınlatma metnini güncelle; sağlık gibi özel nitelikli veri için açık rıza onay kutusu (`ConsentCheck`, varsayılan işaretsiz) zorunlu.
 
 ## Çalışma şekli
 

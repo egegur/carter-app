@@ -38,6 +38,9 @@ export const colors = {
   nightText: '#F2F5F8',
   nightMuted: '#B7C2CE',
 
+  /** Form hataları. Suçlayıcı değil, yol gösterici metinle kullanılır. */
+  danger: '#B42318',
+
   onDark: '#FFFFFF',
 } as const;
 

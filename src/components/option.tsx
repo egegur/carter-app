@@ -12,54 +12,98 @@ type ListProps<T extends string> = {
   onChange: (value: T) => void;
 };
 
-/** Alt alta seçenekler; tek seçim. Kurulum ve kaçırma ekranlarında kullanılır. */
+type MultiProps<T extends string> = {
+  options: readonly Option<T>[];
+  values: readonly T[];
+  onToggle: (value: T) => void;
+};
+
+type RowProps = {
+  option: Option<string>;
+  selected: boolean;
+  multi: boolean;
+  onPress: () => void;
+};
+
+function OptionRow({ option, selected, multi, onPress }: RowProps) {
+  return (
+    <Pressable
+      accessibilityRole={multi ? 'checkbox' : 'radio'}
+      accessibilityState={multi ? { checked: selected } : { selected }}
+      onPress={onPress}
+      style={[styles.row, selected && styles.rowSelected]}>
+      {multi ? (
+        <View style={[styles.box, selected && styles.boxOn]}>
+          {selected ? <Icon name="check" size={14} color={colors.onDark} /> : null}
+        </View>
+      ) : null}
+      <View style={styles.rowText}>
+        <AppText variant={selected ? 'bodyStrong' : 'body'}>{option.label}</AppText>
+        {option.description ? (
+          <AppText variant="caption" color={colors.muted}>
+            {option.description}
+          </AppText>
+        ) : null}
+      </View>
+      {!multi && selected ? <Icon name="check" size={18} color={colors.accent} /> : null}
+    </Pressable>
+  );
+}
+
+/** Alt alta seçenekler; tek seçim. */
 export function OptionList<T extends string>({ options, value, onChange }: ListProps<T>) {
   return (
     <View accessibilityRole="radiogroup" style={styles.list}>
-      {options.map((o) => {
-        const selected = o.value === value;
-        return (
-          <Pressable
-            key={o.value}
-            accessibilityRole="radio"
-            accessibilityState={{ selected }}
-            onPress={() => onChange(o.value)}
-            style={[styles.row, selected && styles.rowSelected]}>
-            <View style={styles.rowText}>
-              <AppText variant={selected ? 'bodyStrong' : 'body'}>{o.label}</AppText>
-              {o.description ? (
-                <AppText variant="caption" color={colors.muted}>
-                  {o.description}
-                </AppText>
-              ) : null}
-            </View>
-            {selected ? <Icon name="check" size={18} color={colors.accent} /> : null}
-          </Pressable>
-        );
-      })}
+      {options.map((o) => (
+        <OptionRow key={o.value} option={o} selected={o.value === value} multi={false} onPress={() => onChange(o.value)} />
+      ))}
     </View>
   );
 }
 
-type ChipProps<T extends string> = ListProps<T>;
+/** Alt alta seçenekler; çoklu seçim (onay kutulu). */
+export function CheckList<T extends string>({ options, values, onToggle }: MultiProps<T>) {
+  return (
+    <View style={styles.list}>
+      {options.map((o) => (
+        <OptionRow key={o.value} option={o} selected={values.includes(o.value)} multi onPress={() => onToggle(o.value)} />
+      ))}
+    </View>
+  );
+}
 
-/** Yan yana kısa seçenekler (sıklık, ton, kanıt türü). */
-export function ChipGroup<T extends string>({ options, value, onChange }: ChipProps<T>) {
+type ChipProps = { label: string; selected: boolean; multi: boolean; onPress: () => void };
+
+function Chip({ label, selected, multi, onPress }: ChipProps) {
+  return (
+    <Pressable
+      accessibilityRole={multi ? 'checkbox' : 'radio'}
+      accessibilityState={multi ? { checked: selected } : { selected }}
+      onPress={onPress}
+      style={[styles.chip, selected && styles.chipSelected]}>
+      <AppText style={[styles.chipLabel, selected && styles.chipLabelSelected]}>{label}</AppText>
+    </Pressable>
+  );
+}
+
+/** Yan yana kısa seçenekler; tek seçim (ton, kanıt türü, sıklık). */
+export function ChipGroup<T extends string>({ options, value, onChange }: ListProps<T>) {
   return (
     <View accessibilityRole="radiogroup" style={styles.chips}>
-      {options.map((o) => {
-        const selected = o.value === value;
-        return (
-          <Pressable
-            key={o.value}
-            accessibilityRole="radio"
-            accessibilityState={{ selected }}
-            onPress={() => onChange(o.value)}
-            style={[styles.chip, selected && styles.chipSelected]}>
-            <AppText style={[styles.chipLabel, selected && styles.chipLabelSelected]}>{o.label}</AppText>
-          </Pressable>
-        );
-      })}
+      {options.map((o) => (
+        <Chip key={o.value} label={o.label} selected={o.value === value} multi={false} onPress={() => onChange(o.value)} />
+      ))}
+    </View>
+  );
+}
+
+/** Yan yana kısa seçenekler; çoklu seçim (günler). */
+export function MultiChipGroup<T extends string>({ options, values, onToggle }: MultiProps<T>) {
+  return (
+    <View style={styles.chips}>
+      {options.map((o) => (
+        <Chip key={o.value} label={o.label} selected={values.includes(o.value)} multi onPress={() => onToggle(o.value)} />
+      ))}
     </View>
   );
 }
@@ -80,6 +124,17 @@ const styles = StyleSheet.create({
   },
   rowSelected: { borderWidth: 2, borderColor: colors.accent, backgroundColor: colors.accentSoft },
   rowText: { flex: 1, gap: 2 },
+  box: {
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  boxOn: { backgroundColor: colors.accent, borderColor: colors.accent },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   chip: {
     minHeight: minTouch,

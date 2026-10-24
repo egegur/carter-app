@@ -30,6 +30,9 @@ Taklit edilen yerlerin tam listesi: `grep -rn "MOCK:\|TODO(" src`
 - [ ] **Ses kaydı** (`expo-audio`): neden çapası, en fazla 25 sn, sadece cihazda (`src/app/onboarding/why.tsx`).
 - [ ] **Kamera kanıtı** (`expo-camera`): sadece anlık çekim, cihaz içi uygunsuz içerik kontrolü (`src/app/proof.tsx`).
 - [ ] Odak seansı arka plana geçince süre doğru kalsın (bitiş zamanını sakla, kalan süreyi ondan hesapla).
+- [ ] Sabah planında saat alanı serbest metin; native saat seçiciye geçir.
+- [ ] Günlük işleri hedeflerin sıklığına göre üret (bugün o hedefin günü mü?). Şu an kurulum sonunda her hedeften bir iş oluşuyor.
+- [ ] Profil → İzinler ekranı: verilen izinleri ve açık rızayı göster, geri alma.
 - [ ] Kaçırma sebeplerini ve hesap cevaplarını sunucuya kaydet.
 
 ## 4. Native modül (`modules/carter-native`)
@@ -65,4 +68,5 @@ Taklit edilen yerlerin tam listesi: `grep -rn "MOCK:\|TODO(" src`
 - [ ] Carter animasyonu (Rive veya Lottie) — `src/components/carter.tsx` içindeki `CarterAvatar` değişecek, ekranlar değişmeyecek.
 - [ ] Uygulama ikonu ve açılış ekranı (şu an Expo varsayılanı).
 - [ ] Ana akışlar için testler (jest-expo + Testing Library): kurulum, sıradaki iş → hesap, kaçırma.
-- [ ] Yayından önce: avukat kontrolü (KVKK, kullanım şartları, aydınlatma metni).
+- [ ] Yayından önce: avukat kontrolü (KVKK, kullanım şartları, aydınlatma metni). Taslaklar `src/content/legal.ts`; doldurulacak alanlar: [ŞİRKET UNVANI], [SAĞLAYICI LİSTESİ], [SÜRE], [E-POSTA ADRESİ], [YAŞ SINIRI]. Taslak uyarı kartı `src/app/legal/[doc].tsx` içinden kaldırılacak.
+- [ ] Açık rıza kaydı: kullanıcının rıza verdiği metin sürümü ve tarih sunucuda saklanmalı (ispat yükü veri sorumlusunda).

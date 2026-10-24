@@ -54,3 +54,8 @@ export function formatClock(totalSeconds: number): string {
   const r = s % 60;
   return `${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`;
 }
+
+/** Türkçe kurala göre büyük harf (i → İ, ı → I); cihazın dil ayarından bağımsız. */
+export function trUpper(text: string): string {
+  return text.replace(/i/g, 'İ').replace(/ı/g, 'I').toUpperCase();
+}

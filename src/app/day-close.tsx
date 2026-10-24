@@ -10,15 +10,19 @@ import { CarterBubble } from '@/components/carter';
 import { Field } from '@/components/field';
 import { BackHeader } from '@/components/header';
 import { Screen } from '@/components/screen';
+import { useFormErrors } from '@/hooks/use-form-errors';
 import { useAppState } from '@/state/app-store';
 import { colors, space } from '@/theme/tokens';
 import { withPossessiveAccusative } from '@/utils/format';
+import { checkText, TEXT_RULES } from '@/utils/validation';
 
 /** Gün kapanışı (akşam hesabı) */
 export default function DayCloseScreen() {
   const tasks = useAppState((s) => s.tasks);
   const streak = useAppState((s) => s.streakDays);
   const [tomorrow, setTomorrow] = useState('');
+  // Boş bırakılabilir; yazıldıysa anlamlı olmalı.
+  const form = useFormErrors({ tomorrow: tomorrow.trim() ? checkText(tomorrow, TEXT_RULES.task) : null });
 
   const done = tasks.filter((t) => t.done).length;
   const total = tasks.length;
@@ -35,7 +39,7 @@ export default function DayCloseScreen() {
     <Screen
       header={<BackHeader title="Akşam hesabı · 21:00" />}
       // MOCK: gün kapanışı ve yarının ilk işi sunucuya kaydedilecek.
-      footer={<Button title="Günü kapat" onPress={() => router.dismissTo('/')} />}>
+      footer={<Button title="Günü kapat" onPress={() => form.submit(() => router.dismissTo('/'))} />}>
       <CarterBubble message={message} />
 
       <View style={styles.stats}>
@@ -60,6 +64,9 @@ export default function DayCloseScreen() {
         placeholder="Örn. Raporun ikinci bölümü"
         value={tomorrow}
         onChangeText={setTomorrow}
+        onBlur={() => form.touch('tomorrow')}
+        error={form.errorFor('tomorrow')}
+        maxLength={TEXT_RULES.task.maxLength}
       />
     </Screen>
   );
