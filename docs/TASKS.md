@@ -26,7 +26,9 @@ Taklit edilen yerlerin tam listesi: `grep -rn "MOCK:\|TODO(" src`
 
 ## 3. Günlük döngünün gerçek hâli
 
-- [ ] **Bildirimler** (`expo-notifications`): sabah planı, hesap randevusu, akşam hesabı; bildirimden doğru ekrana derin link.
+- [x] **Bildirimler** (`expo-notifications`): sabah planı 08:30, hesap saati 14:00, akşam hesabı 21:00 + her hedef için kendi saatinde, sıklığa göre (hafta içi / belirli günler). Dokununca ilgili ekran açılır. Plan: `src/content/reminders.ts`.
+- [ ] Bildirimleri gerçek telefonda dene (Expo Go yeterli): izin, saatinde gelme, dokununca doğru ekran.
+- [ ] Bildirim saatlerini kullanıcı ayarlayabilsin (Profil → Sabah ve akşam saatleri).
 - [ ] **Ses kaydı** (`expo-audio`): neden çapası, en fazla 25 sn, sadece cihazda (`src/app/onboarding/why.tsx`).
 - [ ] **Kamera kanıtı** (`expo-camera`): sadece anlık çekim, cihaz içi uygunsuz içerik kontrolü (`src/app/proof.tsx`).
 - [ ] Odak seansı arka plana geçince süre doğru kalsın (bitiş zamanını sakla, kalan süreyi ondan hesapla).

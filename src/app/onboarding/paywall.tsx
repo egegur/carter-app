@@ -6,7 +6,8 @@ import { AppText } from '@/components/app-text';
 import { Button } from '@/components/button';
 import { Icon } from '@/components/icon';
 import { Screen } from '@/components/screen';
-import { actions } from '@/state/app-store';
+import { scheduleAll } from '@/services/notifications';
+import { actions, getProfile } from '@/state/app-store';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
 const BENEFITS = [
@@ -30,6 +31,7 @@ export default function PaywallScreen() {
   const finish = () => {
     // MOCK: satın alma / deneme başlatma RevenueCat ile gelecek (docs/TASKS.md).
     actions.finishOnboarding();
+    scheduleAll(getProfile());
     router.replace('/');
   };
 

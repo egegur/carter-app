@@ -63,7 +63,8 @@ export const CATEGORIES: readonly CategoryInfo[] = [
   {
     value: 'home',
     defaultProof: 'photo',
-    defaultTime: '21:00',
+    // Akşam hesabıyla (21:00) çakışmasın.
+    defaultTime: '20:30',
     label: 'Ev işleri',
     lead: 'Ev işleri için',
     goalPlaceholder: 'Örn. Her akşam mutfağı toplamak',

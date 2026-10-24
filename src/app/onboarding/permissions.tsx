@@ -8,6 +8,7 @@ import { ConsentCheck, LegalLink } from '@/components/consent';
 import { StepHeader } from '@/components/header';
 import { Screen } from '@/components/screen';
 import { categoryInfo, type Category } from '@/content/categories';
+import { requestPermission } from '@/services/notifications';
 import { actions, useAppState } from '@/state/app-store';
 import { colors } from '@/theme/tokens';
 
@@ -44,10 +45,22 @@ function permissionsFor(categories: Category[]): Permission[] {
 export default function PermissionsScreen() {
   const categories = useAppState((s) => s.profile.categories);
   const healthConsent = useAppState((s) => s.profile.healthConsent);
-  // MOCK: gerçek izin istekleri native modüllerle gelecek (docs/TASKS.md).
   const [granted, setGranted] = useState<Partial<Record<PermissionKey, boolean>>>({});
+  const [denied, setDenied] = useState(false);
 
   const permissions = permissionsFor(categories);
+
+  const grant = async (key: PermissionKey) => {
+    if (key === 'notifications') {
+      const result = await requestPermission();
+      // Web önizlemesinde bildirim yok; akış devam etsin diye açık sayılır.
+      setGranted((g) => ({ ...g, notifications: result !== 'denied' }));
+      if (result === 'denied') setDenied(true);
+      return;
+    }
+    // MOCK: Ekran Süresi ve Sağlık izinleri native modülle gelecek (docs/TASKS.md).
+    setGranted((g) => ({ ...g, [key]: true }));
+  };
 
   return (
     <Screen
@@ -85,11 +98,17 @@ export default function PermissionsScreen() {
               title={granted[p.key] ? 'Açık' : 'İzin ver'}
               variant="secondary"
               disabled={granted[p.key] || blocked}
-              onPress={() => setGranted((g) => ({ ...g, [p.key]: true }))}
+              onPress={() => grant(p.key)}
             />
           </Card>
         );
       })}
+
+      {denied ? (
+        <AppText variant="caption" color={colors.muted} accessibilityLiveRegion="polite">
+          Bildirim izni kapalı. Sonra telefonunun Ayarlar → Carter → Bildirimler bölümünden açabilirsin.
+        </AppText>
+      ) : null}
 
       <AppText variant="caption" color={colors.muted} align="center">
         Verilerinin nasıl işlendiğini <LegalLink doc="aydinlatma" label="Aydınlatma Metni" />
