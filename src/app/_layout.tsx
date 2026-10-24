@@ -11,7 +11,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
-import { useAppState } from '@/state/app-store';
+import { hydrate, useAppState } from '@/state/app-store';
 import { colors } from '@/theme/tokens';
 
 SplashScreen.preventAutoHideAsync();
@@ -25,7 +25,12 @@ export default function RootLayout() {
     PlusJakartaSans_800ExtraBold,
   });
   const onboarded = useAppState((s) => s.onboarded);
-  const ready = fontsLoaded || fontError !== null;
+  const hydrated = useAppState((s) => s.hydrated);
+  const ready = (fontsLoaded || fontError !== null) && hydrated;
+
+  useEffect(() => {
+    hydrate();
+  }, []);
 
   useEffect(() => {
     if (ready) SplashScreen.hideAsync();

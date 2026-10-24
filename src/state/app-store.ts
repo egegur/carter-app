@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
 
 import { categoryInfo, type Category } from '@/content/categories';
@@ -36,14 +37,19 @@ export type Profile = {
 };
 
 type State = {
+  /** Telefondaki kayıt okundu mu? Okunana kadar açılış ekranı gösterilir. */
+  hydrated: boolean;
   onboarded: boolean;
   profile: Profile;
   tasks: Task[];
+  /** Görevlerin ait olduğu gün (YYYY-AA-GG). Gün değişince işler sıfırlanır. */
+  tasksDate: string;
   streakDays: number;
   jokersLeft: number;
 };
 
-let state: State = {
+const INITIAL: State = {
+  hydrated: false,
   onboarded: false,
   profile: {
     name: 'Deniz',
@@ -55,15 +61,19 @@ let state: State = {
     healthConsent: false,
   },
   tasks: initialTasks,
+  tasksDate: today(),
   streakDays: 6,
   jokersLeft: 1,
 };
+
+let state: State = INITIAL;
 
 const listeners = new Set<() => void>();
 
 function setState(update: (s: State) => State) {
   state = update(state);
   listeners.forEach((l) => l());
+  if (state.hydrated) scheduleSave();
 }
 
 function subscribe(listener: () => void) {
@@ -108,7 +118,68 @@ export const actions = {
   spendJoker() {
     setState((s) => ({ ...s, jokersLeft: Math.max(0, s.jokersLeft - 1) }));
   },
+  /** Telefondaki tüm Carter verisini siler ve kurulumu baştan başlatır. */
+  async resetAll() {
+    await clearSaved();
+    setState(() => ({ ...INITIAL, hydrated: true, tasksDate: today() }));
+  },
 };
+
+/** Uygulama açılırken bir kez çağrılır: telefondaki kaydı okur. */
+export async function hydrate() {
+  const saved = await loadSaved();
+  setState((s) => {
+    if (!saved) return { ...s, hydrated: true };
+    const next: State = { ...s, ...saved, hydrated: true };
+    // Yeni gün: hedeflerden bugünün işleri yeniden oluşur.
+    if (next.onboarded && next.tasksDate !== today()) {
+      const fresh = tasksFromGoals(next.profile);
+      return { ...next, tasks: fresh.length ? fresh : next.tasks.map((t) => ({ ...t, done: false })), tasksDate: today() };
+    }
+    return next;
+  });
+}
+
+// --- Kalıcı kayıt (AsyncStorage) ---
+// MOCK: sunucu gelince asıl kayıt sunucuda olacak; bu yerel kopya çevrimdışı kullanım için kalır.
+
+const STORAGE_KEY = 'carter:state:v1';
+type Saved = Omit<State, 'hydrated'>;
+let saveTimer: ReturnType<typeof setTimeout> | null = null;
+
+function today(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function scheduleSave() {
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const { hydrated: _, ...saved } = state;
+    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(saved)).catch(() => {});
+  }, 300);
+}
+
+async function loadSaved(): Promise<Partial<Saved> | null> {
+  try {
+    const raw = await AsyncStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<Saved>;
+    // Eksik alanlar varsayılanla tamamlanır (sürüm farkı olursa uygulama çökmesin).
+    return { ...parsed, profile: { ...INITIAL.profile, ...parsed.profile } };
+  } catch {
+    return null;
+  }
+}
+
+async function clearSaved() {
+  if (saveTimer) clearTimeout(saveTimer);
+  try {
+    await AsyncStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Silinemese bile bellekteki durum sıfırlanır.
+  }
+}
 
 // MOCK: günlük işleri ileride sunucu, sıklığa göre (bugün o hedefin günü mü?) üretecek.
 function tasksFromGoals(profile: Profile): Task[] {
