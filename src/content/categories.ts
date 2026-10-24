@@ -85,3 +85,12 @@ export const CATEGORIES: readonly CategoryInfo[] = [
 export function categoryInfo(value: Category): CategoryInfo {
   return CATEGORIES.find((c) => c.value === value) ?? CATEGORIES[CATEGORIES.length - 1];
 }
+
+/**
+ * Ekranda gösterilecek ad ve soru başı. "Başka bir şey" seçildiyse kullanıcının yazdığı ad kullanılır.
+ */
+export function categoryDisplay(value: Category, otherLabel: string): { label: string; lead: string } {
+  const info = categoryInfo(value);
+  const custom = value === 'other' ? otherLabel.trim() : '';
+  return custom ? { label: custom, lead: `${custom} için` } : { label: info.label, lead: info.lead };
+}

@@ -34,6 +34,22 @@ const MASH = ['qwer', 'asdf', 'sdfg', 'dfgh', 'fghj', 'ghjk', 'hjkl', 'zxcv', 'x
 // Tek başına yazıldığında anlam taşımayan dolgu metinler (cümle içinde geçebilirler: "deneme sınavı çözmek").
 const FILLER = new Set(['abc', 'abcd', 'xyz', 'test', 'deneme', 'asd', 'qwe', 'bla', 'blabla', 'falan', 'falan filan', 'vs', 'yok', 'bilmiyorum']);
 
+// Türkçede neredeyse hiç yan yana gelmeyen harf çiftleri (klavyede rastgele basınca sık çıkar).
+const RARE_PAIRS = ['sd', 'df', 'fg', 'gh', 'hj', 'jk', 'kj', 'jh', 'hg', 'gf', 'fd', 'dj', 'jd', 'fj', 'jf', 'dh', 'hd', 'fh', 'hf', 'qw', 'wq', 'xz', 'zx', 'cv', 'vc', 'vb', 'bv', 'wx', 'jl', 'lj', 'jg', 'gj', 'zj', 'jz', 'fv', 'vf', 'pq', 'qp'];
+const CONSONANT_RUN = /[^aeıioöuüâîûy]{4,}/;
+
+/**
+ * Rastgele yazılmış gibi görünen kelime mi?
+ * Kurallar: 4+ ünsüz yan yana, ünlü oranı çok düşük ya da Türkçede olmayan harf çifti.
+ */
+function looksRandom(word: string): boolean {
+  if (word.length < 4) return false;
+  if (CONSONANT_RUN.test(word)) return true;
+  const vowels = (word.match(/[aeıioöuüâîûy]/g) ?? []).length;
+  if (word.length >= 5 && vowels / word.length < 0.25) return true;
+  return RARE_PAIRS.some((p) => word.includes(p));
+}
+
 /** Türkçe büyük/küçük harf kuralıyla küçültür (I → ı, İ → i). */
 export function trLower(text: string): string {
   return text.replace(/I/g, 'ı').replace(/İ/g, 'i').toLowerCase();
@@ -76,6 +92,10 @@ export function checkText(raw: string, rule: TextRule): string | null {
   const longWords = list.filter((w) => w.length >= 3);
   const noVowel = longWords.filter((w) => !VOWEL.test(w)).length;
   if (longWords.length > 0 && noVowel / longWords.length > 0.5) return 'Anlamlı kelimelerle yaz.';
+
+  // Kelimelerin üçte birinden fazlası rastgele görünüyorsa geçme.
+  const randomCount = list.filter(looksRandom).length;
+  if (randomCount > 0 && randomCount / list.length > 1 / 3) return 'Anlamlı kelimelerle yaz.';
 
   const unique = new Set(list).size;
   if (list.length >= 2 && (unique === 1 || unique / list.length < 0.5)) return 'Aynı kelimeyi tekrarlama.';

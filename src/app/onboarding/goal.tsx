@@ -7,7 +7,7 @@ import { Field } from '@/components/field';
 import { FrequencyPicker } from '@/components/frequency-picker';
 import { StepHeader } from '@/components/header';
 import { Screen } from '@/components/screen';
-import { categoryInfo } from '@/content/categories';
+import { categoryDisplay, categoryInfo } from '@/content/categories';
 import { checkFrequency } from '@/content/frequency';
 import { useFormErrors } from '@/hooks/use-form-errors';
 import { actions, EMPTY_GOAL, useAppState } from '@/state/app-store';
@@ -21,9 +21,11 @@ export default function GoalScreen() {
   const index = Number(i) || 0;
   const categories = useAppState((s) => s.profile.categories);
   const goals = useAppState((s) => s.profile.goals);
+  const otherLabel = useAppState((s) => s.profile.otherLabel);
 
   const category = categories[index] ?? categories[0] ?? 'other';
   const info = categoryInfo(category);
+  const display = categoryDisplay(category, otherLabel);
   const goal = goals[category] ?? EMPTY_GOAL;
   const total = categories.length;
 
@@ -45,11 +47,11 @@ export default function GoalScreen() {
       footer={<Button title={index + 1 < total ? 'Sıradaki hedef' : 'Devam'} onPress={next} />}>
       {total > 1 ? (
         <AppText variant="overline" color={colors.accent}>
-          {`HEDEF ${index + 1} / ${total} · ${trUpper(info.label)}`}
+          {`HEDEF ${index + 1} / ${total} · ${trUpper(display.label)}`}
         </AppText>
       ) : null}
 
-      <CarterBubble message={`${info.lead} tam olarak neyi, ne sıklıkla yapmak istiyorsun?`} />
+      <CarterBubble message={`${display.lead} tam olarak neyi, ne sıklıkla yapmak istiyorsun?`} />
 
       <Field
         label="Hedefin"

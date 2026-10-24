@@ -25,6 +25,8 @@ export type Profile = {
   name: string;
   /** Kurulumda seçilen alanlar (birden fazla olabilir), seçim sırasıyla. */
   categories: Category[];
+  /** "Başka bir şey" seçildiyse kullanıcının yazdığı alan adı. */
+  otherLabel: string;
   /** Her alan için bir hedef. */
   goals: Partial<Record<Category, Goal>>;
   why: string;
@@ -46,6 +48,7 @@ let state: State = {
   profile: {
     name: 'Deniz',
     categories: [],
+    otherLabel: '',
     goals: {},
     why: '',
     tone: 'soft',
