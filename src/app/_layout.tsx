@@ -1,18 +1,62 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
+import {
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_500Medium,
+  PlusJakartaSans_600SemiBold,
+  PlusJakartaSans_700Bold,
+  PlusJakartaSans_800ExtraBold,
+  useFonts,
+} from '@expo-google-fonts/plus-jakarta-sans';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+import { useAppState } from '@/state/app-store';
+import { colors } from '@/theme/tokens';
 
 SplashScreen.preventAutoHideAsync();
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+export default function RootLayout() {
+  const [fontsLoaded, fontError] = useFonts({
+    PlusJakartaSans_400Regular,
+    PlusJakartaSans_500Medium,
+    PlusJakartaSans_600SemiBold,
+    PlusJakartaSans_700Bold,
+    PlusJakartaSans_800ExtraBold,
+  });
+  const onboarded = useAppState((s) => s.onboarded);
+  const ready = fontsLoaded || fontError !== null;
+
+  useEffect(() => {
+    if (ready) SplashScreen.hideAsync();
+  }, [ready]);
+
+  if (!ready) return null;
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <>
+      <StatusBar style="dark" />
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.ground } }}>
+        {/* Kurulum bitmeden sadece kurulum ekranları açılır. */}
+        <Stack.Protected guard={!onboarded}>
+          <Stack.Screen name="onboarding" />
+        </Stack.Protected>
+
+        <Stack.Protected guard={onboarded}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="checkin" />
+          <Stack.Screen name="focus" options={{ gestureEnabled: false }} />
+          <Stack.Screen name="report" />
+          <Stack.Screen name="proof" options={{ presentation: 'fullScreenModal' }} />
+          <Stack.Screen name="missed" />
+          <Stack.Screen name="day-close" />
+          <Stack.Screen name="chat" />
+          <Stack.Screen name="duel" />
+          <Stack.Screen name="team-streak" />
+          <Stack.Screen name="community" />
+          <Stack.Screen name="weekly" />
+        </Stack.Protected>
+      </Stack>
+    </>
   );
 }
