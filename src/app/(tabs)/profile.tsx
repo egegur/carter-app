@@ -7,6 +7,7 @@ import { Button } from '@/components/button';
 import { Card } from '@/components/card';
 import { ListRow } from '@/components/list-row';
 import { Screen } from '@/components/screen';
+import { cancelAll } from '@/services/notifications';
 import { actions, useAppState, type Tone } from '@/state/app-store';
 import { colors, space } from '@/theme/tokens';
 
@@ -55,7 +56,7 @@ export default function ProfileScreen() {
         <Button
           title={confirmReset ? 'Emin misin? Tekrar dokun, her şey silinsin' : 'Verilerimi sil ve baştan başla'}
           variant="ghost"
-          onPress={() => (confirmReset ? actions.resetAll() : setConfirmReset(true))}
+          onPress={() => (confirmReset ? (cancelAll(), actions.resetAll()) : setConfirmReset(true))}
         />
         {confirmReset ? (
           <AppText variant="caption" color={colors.muted} align="center">

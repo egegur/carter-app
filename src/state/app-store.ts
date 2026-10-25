@@ -81,6 +81,11 @@ function subscribe(listener: () => void) {
   return () => listeners.delete(listener);
 }
 
+/** Hook dışından (servislerden) okumak için anlık profil. */
+export function getProfile(): Profile {
+  return state.profile;
+}
+
 export function useAppState<T>(select: (s: State) => T): T {
   return useSyncExternalStore(subscribe, () => select(state), () => select(state));
 }

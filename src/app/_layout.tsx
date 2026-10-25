@@ -6,11 +6,13 @@ import {
   PlusJakartaSans_800ExtraBold,
   useFonts,
 } from '@expo-google-fonts/plus-jakarta-sans';
-import { Stack } from 'expo-router';
+import * as Notifications from 'expo-notifications';
+import { router, Stack, type Href } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
+import { isSupported } from '@/services/notifications';
 import { hydrate, useAppState } from '@/state/app-store';
 import { colors } from '@/theme/tokens';
 
@@ -31,6 +33,18 @@ export default function RootLayout() {
   useEffect(() => {
     hydrate();
   }, []);
+
+  // Bildirime dokununca ilgili ekranı aç (kurulum bitmişse).
+  useEffect(() => {
+    if (!isSupported || !ready || !onboarded) return;
+    const open = (response: Notifications.NotificationResponse | null) => {
+      const url = response?.notification.request.content.data?.url;
+      if (typeof url === 'string' && url.startsWith('/')) router.push(url as Href);
+    };
+    Notifications.getLastNotificationResponseAsync().then(open).catch(() => {});
+    const sub = Notifications.addNotificationResponseReceivedListener(open);
+    return () => sub.remove();
+  }, [ready, onboarded]);
 
   useEffect(() => {
     if (ready) SplashScreen.hideAsync();
