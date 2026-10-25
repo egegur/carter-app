@@ -1,0 +1,22 @@
+rules_version = '2';
+
+// Carter Firestore kuralları.
+// İlke: herkes sadece kendi verisini okur ve yazar. Topluluk/düello verisi eklenince ayrı kurallar gelecek.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // users/{uid}: profil, hedefler, ton, açık rıza kaydı
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+
+      // users/{uid}/days/{yyyy-mm-dd}: günün işleri ve hesap cevapları
+      match /days/{day} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+
+    // Tanımlanmayan her şey kapalı.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
